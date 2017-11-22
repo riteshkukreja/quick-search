@@ -1,0 +1,27 @@
+{
+  "name": "quick-search",
+  "version": "1.0.0",
+  "description": "quick aggregated search app to learn electron",
+  "main": "index.js",
+  "scripts": {
+    "make": "electron .",
+    "build": "electron-packager . --out ./dist --overwrite",
+    "package": "build -w"
+  },
+  "author": "Ritesh",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "0.22.0",
+    "electron-log": "^2.2.7",
+    "electron-notifications": "^1.0.0",
+    "electron-notify": "^0.1.0",
+    "jsdom": "latest"
+  },
+  "devDependencies": {
+    "electron": "^1.6.11"
+  },
+  "build": {
+    "appId": "io.github.riteshkukreja.quicksearch",
+    "productName": "Quick Search"
+  }
+}
