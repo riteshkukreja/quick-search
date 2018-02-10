@@ -90,7 +90,7 @@ ul li.error {
 
 /** Result types **/
 ul li::after {
-    content: "";
+    content: attr(data-type);
     display: block;
     position: absolute;
     bottom: 10px;
@@ -138,6 +138,11 @@ ul li.google::after {
 ul li.quora::after {
     content: "Quora";
     background: #c0392b;
+}
+
+ul li.app::after {
+    content: "App";
+    background: #2ecc71;
 }
 
 ul li.text::after, ul li.error::after {

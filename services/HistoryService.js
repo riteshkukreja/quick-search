@@ -10,6 +10,10 @@ app.match = function(_cmd) {
 };
 
 app.push = function(instruction) {
+	if(instruction.trim().length == 0) return;
+
+	instruction = instruction.trim();
+
 	app.updated = false;
 	for(var i = history.length-1; i >= 0; i--) {
 		if(history[i] == instruction) {

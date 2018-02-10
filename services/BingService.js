@@ -1,7 +1,7 @@
 var SearchConstructor = require("./SearchConstructor");
 
 var BingService = new SearchConstructor(
-	"http://localhost/google_search.php?type=bing&q=",
+	"http://localhost/google_search/index.php?type=bing&q=",
 	/bing:/,
 	function(_result) {
         return $("<li/>", { 

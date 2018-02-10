@@ -64,7 +64,7 @@ var app = function(url, regex, drawCallback, executeCallback, limit, priority, t
     this.execute = executeCallback || function(_cmd, callback, num) {
         // remove handle if present
         _cmd = _cmd.replace(this.regex, "");
-
+        
         this.getResults(_cmd, num ? num: this.limit, callback);
     };
 };

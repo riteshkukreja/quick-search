@@ -4,6 +4,7 @@ var HistoryService      = require("./HistoryService");
 var Configurations      = require("./Configurations");
 var SearchService       = require("./SearchService");
 var BrowserService      = require("./BrowserService");
+var AppService          = require("./AppService");
 var WindowService       = require("./WindowService");
 
 var app = {};
@@ -108,6 +109,7 @@ app.onResultClick = function() {
     switch(data_type) {
         case "web":
                 HistoryService.push(textarea.val());
+                console.log(data_item);
                 //app.search("cmd:start chrome " + data_item.url);
                 BrowserService.execute(data_item.url, function(response) {}, 1);
                 break;
@@ -121,6 +123,11 @@ app.onResultClick = function() {
         case "dir":
                 app.updateSearch("ls \"" + data_item + "\"");
                 app.search("cmd:ls \"" + data_item + "\"");
+                break;
+        case "app":
+                HistoryService.push(data_item._name);
+                AppService.execute(data_item, (response) => {}, 1);
+                app.clear();
                 break;
     }
     
@@ -162,7 +169,7 @@ app.prioritize = function(results, priority) {
 
 app.search = function(query) {
     SearchService.execute(query, function(response, error) {
-        if(query.indexOf($.trim(app.input.val())) == -1) return;
+        if(app.input.val().trim().length == 0 || query.indexOf($.trim(app.input.val())) == -1) return;
 
         if(response == null) {
             app.parent.prepend(error);
