@@ -20,3 +20,28 @@ It uses `electron-packager` to build native application executable. To build exe
 ```s
 npm run package
 ```
+
+## Screenshots
+### Terminal Command Execution
+![Terminal Command](https://raw.githubusercontent.com/riteshkukreja/quick-search/master/screenshots/terminal.png)
+
+### All apps
+![Terminal Command](https://raw.githubusercontent.com/riteshkukreja/quick-search/master/screenshots/all_apps.png)
+
+### Search app
+![Terminal Command](https://raw.githubusercontent.com/riteshkukreja/quick-search/master/screenshots/search_app.png)
+
+### Search Google
+![Terminal Command](https://raw.githubusercontent.com/riteshkukreja/quick-search/master/screenshots/search_google.png)
+
+### Search Bing
+![Terminal Command](https://raw.githubusercontent.com/riteshkukreja/quick-search/master/screenshots/search_bing.png)
+
+### Search Quora
+![Terminal Command](https://raw.githubusercontent.com/riteshkukreja/quick-search/master/screenshots/search_quora.png)
+
+### History
+![Terminal Command](https://raw.githubusercontent.com/riteshkukreja/quick-search/master/screenshots/history.png)
+
+### Configurations
+![Terminal Command](https://raw.githubusercontent.com/riteshkukreja/quick-search/master/screenshots/config.png)
