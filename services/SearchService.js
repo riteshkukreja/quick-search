@@ -6,6 +6,7 @@ var QuoraService 		= require("./QuoraService");
 var TerminalService 	= require("./TerminalService");
 var HistoryService 		= require("./HistoryService");
 var WindowsAppFinder	= require("./WindowsAppFinder");
+var ConfigService		= require("./ConfigService");
 
 var app = {};
 app.modules = [
@@ -14,7 +15,8 @@ app.modules = [
 	QuoraService,
 	TerminalService,
 	HistoryService,
-	WindowsAppFinder
+	WindowsAppFinder,
+	ConfigService
 ];
 
 var showError = function(res) {

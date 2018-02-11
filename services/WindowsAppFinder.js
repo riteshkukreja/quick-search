@@ -66,12 +66,16 @@ class WindowsAppFinder {
     }
 
     execute(_cmd, callback, num) {
+        if(_cmd.match(this._REGEX))
+            num = undefined;
+            
         _cmd = _cmd.replace(this._REGEX, "");
+        
         this.getResults(_cmd, num)
             .then(apps => {
                 const appsDom = apps.map(app => this.draw(app));
                 callback(appsDom);
-            }).catch(err => console.error(err));
+            }).catch(err =>callback(null, err));
     }
 
     run(app, callback) {
@@ -85,12 +89,13 @@ class WindowsAppFinder {
     }
 
     async getResults(query, num) {
+        num = num || this._appList.length;
+
         if(query.trim().length == 0) 
             return this._appList.slice(0, num);
 
         const filteredApps = this._appList
             .filter(app => app._name.toLowerCase().match(query.toLowerCase()))
-            .map(a => { console.log(a); return a; })
             .sort((a, b) => this.getResultFitness(query, a) - this.getResultFitness(query, b))
             .slice(0, num);
 

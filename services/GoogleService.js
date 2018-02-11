@@ -2,7 +2,8 @@ var SearchConstructor = require("./SearchConstructor");
 
 var GoogleService = new SearchConstructor(
 	"http://localhost/google_search/index.php?type=google&q=",
-	/google:/,
+    /google:/,
+    "Google",
 	function(_result) {
         return $("<li/>", { 
             class: "result google",

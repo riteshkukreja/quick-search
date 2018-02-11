@@ -6,6 +6,7 @@ app.regex = /config:/;
 app.priority = 10;
 
 app.match = function(_cmd) {
+    console.log("[CONFIG]", _cmd);
     return _cmd.match(app.regex);
 };
 
@@ -15,45 +16,29 @@ app.draw = function(_result) {
         "data-type": "config" 
     }).data("item", _result)
         .append(
-            $("<h4/>", { text: _result.title })
-        ).append(
-            $("<span/>", { text: _result.url })
-        ).append(
-            $("<p/>", { text: _result.description })
+            $("<h4/>")
+                .append($("<span/>", { text: _result.title, style: 'font-weight: 100; margin-right: 10px;' }))
+                .append($("<span/>", { text: _result.val }))
         );
 };
 
-var processResults = function(response) {
-    var ret = [];
-    for(res of response)
-        ret.push(app.draw(res));
-    return ret;
-}
+app.getResults = function() {
+	const configs = [
+        { title: 'Search Engine', val: Configurations['searchEngine'].name },
+        { title: 'Number of results per page', val: Configurations['resultsCount'] },
+        { title: 'Number of history items', val: Configurations['lastHistoryCount'] },
+        { title: 'Connected to internet', val: Configurations['isInternetConnected'] }
+    ];
 
-app.getResults = function(query, num, callback) {
-	$.ajax({
-        url: app.URL + query + "&limit=" + num,
-        method: 'get',
-        dataType: 'json',
-        success: function(response) {
-            if(typeof response.success != "undefined") {
-                // failed
-            } else {
-                // success
-                callback(processResults(response));
-            }
-        },
-        failed: function(err) {
-
-        }
-    });
+    return configs.slice()
+        .map(item => app.draw(item));
 };
 
 app.execute = function(_cmd, callback, num) {
-    // remove handle if present
-    _cmd = _cmd.replace(app.regex, "");
+    console.log("[CONFIG]", _cmd);
 
-    app.getResults(_cmd, num ? num: app.limit, callback);
+    const configs = app.getResults();
+    callback(configs);
 };
 
 module.exports = app;

@@ -1,11 +1,13 @@
 var exec = require('child_process').exec;
+const spawn = require('child_process').spawn;
 const pathModule = require("path");
 
 var app = {};
 app.regex = /cmd:/;
 app.priority = 10;
 
-var path = require('os').homedir();
+const path = require('os').homedir();
+const cmd_pwd = "pwd";
 
 app.match = function(_cmd) {
     return _cmd.match(app.regex);
@@ -31,7 +33,7 @@ var processResults = function(response, _cmd) {
     var ret = [];
     if(_cmd.match("dir") || _cmd.match("ls")) {
         var path = $.trim(_cmd.replace(/dir/, "").replace(/ls/, ""));
-/*
+    /*
         if(path.length > 0 && path[path.length-1] != "\/")
             path += "\/";*/
 
@@ -53,13 +55,14 @@ app.execute = function(_cmd, callback, num) {
 	// remove handle if present
 	_cmd = _cmd.replace(app.regex, "");
 
-    exec(_cmd, { timeout: 1000, cwd: path }, (e, stdout, stderr) => {
+    const p = exec(_cmd, { timeout: 1000, cwd: path }, (e, stdout, stderr) => {
         if(e) {
-            console.log(stderr);
             callback(null, stderr);
         } else if(stdout) {
             stdout = $.trim(stdout).split("\n");
             callback(processResults(stdout, _cmd));
+        } else {
+            callback(null, "Something went wrong!");
         }
     })
 };

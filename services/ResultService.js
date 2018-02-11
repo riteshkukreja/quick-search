@@ -109,8 +109,6 @@ app.onResultClick = function() {
     switch(data_type) {
         case "web":
                 HistoryService.push(textarea.val());
-                console.log(data_item);
-                //app.search("cmd:start chrome " + data_item.url);
                 BrowserService.execute(data_item.url, function(response) {}, 1);
                 break;
         case "history":
@@ -169,7 +167,7 @@ app.prioritize = function(results, priority) {
 
 app.search = function(query) {
     SearchService.execute(query, function(response, error) {
-        if(app.input.val().trim().length == 0 || query.indexOf($.trim(app.input.val())) == -1) return;
+        if((app.input.val().trim().length == 0 && query.trim().length != 0 ) || query.indexOf($.trim(app.input.val())) == -1) return;
 
         if(response == null) {
             app.parent.prepend(error);

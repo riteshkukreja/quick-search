@@ -1,9 +1,10 @@
 var CacheService    = require("./CacheService");
 
-var app = function(url, regex, drawCallback, executeCallback, limit, priority, timeout) {
+var app = function(url, regex, name, drawCallback, executeCallback, limit, priority, timeout) {
     this.URL = url;
     this.limit = limit || 5;
     this.regex = regex;
+    this.name = name;
     this.priority = priority || 5;
     this.timeout = timeout || 4 * 60 * 60 * 1000; // 4 hours
 
