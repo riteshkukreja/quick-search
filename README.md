@@ -45,3 +45,18 @@ npm run package
 
 ### Configurations
 ![Terminal Command](https://raw.githubusercontent.com/riteshkukreja/quick-search/master/screenshots/config.png)
+
+## TODOs
+[ ] Remove automatic execution of terminal command with `cmd:` flag.
+[ ] Remove execution of terminal commmand on enter-press.
+[ ] Add hook to handle input on key-press to perform some operations (app search or hints) without delay.
+[ ] Make search flags more visible to user by showing the options in start screen.
+[ ] Remove search back-end and move to apis for google, bing and quora.
+[ ] Allow apis key insertion in configurations.
+[ ] Allow editibility in configurations.
+[ ] Make app search faster.
+[ ] Add funtionality for calculator, weather, wikipedia and google translate.
+[ ] Move from app.cache file to db.
+[ ] Add directory hierarchy to services.
+[ ] Move to Typescript?
+[ ] Move from `history:clear` command to gui option to clear history.
