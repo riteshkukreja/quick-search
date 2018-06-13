@@ -5,10 +5,14 @@ var Configurations      = require("./Configurations");
 var SearchService       = require("./SearchService");
 var BrowserService      = require("./BrowserService");
 var AppService          = require("./AppService");
+var SettingService      = require("./SettingService");
 var WindowService       = require("./WindowService");
 
+const KeyDownHook       = require('../hooks/KeyDownHook');
+const SearchHook        = require('../hooks/SearchHook');
+
 var app = {};
-var debounceTime = 1000;
+var debounceTime = 200;
 var timeoutHandler = null;
 var selectedResult = null;
 
@@ -33,14 +37,13 @@ app.init = function() {
 
 app.toggle = function(visibility) {
     if(visibility && app.parent.children().length > 0) {
-        app.parent.slideDown(200);
         app.input.addClass("results");
+        app.parent.slideDown(100);
     } else {
-        app.parent.slideUp(200);
+        app.parent.slideUp(100);
         setTimeout(function() {
-            app.parent.html("");
             app.input.removeClass("results");
-        }, 10);        
+        }, 100);        
     }
 };
 
@@ -102,9 +105,10 @@ app.updateSearch = function(query) {
     textarea.val(query);
 };
 
-app.onResultClick = function() {
+app.onResultClick = function(e) {
     var data_type = selectedResult.data("type");
     var data_item = selectedResult.data("item");
+    console.log(data_type, data_item);
 
     switch(data_type) {
         case "web":
@@ -113,19 +117,24 @@ app.onResultClick = function() {
                 break;
         case "history":
                 app.updateSearch(data_item);
+                app.handleKeyDownHook(data_item);
+                app.handleSearchHook(data_item);
                 break;
         case "file":
                 app.updateSearch("cat \"" + data_item + "\"");
-                app.search("cmd:cat \"" + data_item + "\"");
+                app.handleEnterPress("cmd:cat \"" + data_item + "\"");
                 break;                
         case "dir":
                 app.updateSearch("ls \"" + data_item + "\"");
-                app.search("cmd:ls \"" + data_item + "\"");
+                app.handleEnterPress("cmd:ls \"" + data_item + "\"");
                 break;
         case "app":
                 HistoryService.push(data_item._name);
                 AppService.execute(data_item, (response) => {}, 1);
                 app.clear();
+                break;
+        default:
+                selectedResult.data('handler')(e);
                 break;
     }
     
@@ -136,13 +145,13 @@ app.onResultClick = function() {
 app.prepareResults = function(results, priority) {
     if(!results) return [];
 
-    for(res of results) {
+    for(const res of results) {
         // handle click event
-        res.click(function() {
+        res.click(function(e) {
             app.selectResult($(this));
 
             // execute
-            app.onResultClick();
+            app.onResultClick(e);
         });
 
         res.on("mouseenter", function() {
@@ -152,6 +161,8 @@ app.prepareResults = function(results, priority) {
         res.on("mouseleave", function() {
             app.selectResult(null);
         });
+
+        res.data('priority', priority);
     }
 
     return results;
@@ -159,31 +170,94 @@ app.prepareResults = function(results, priority) {
 
 app.prioritize = function(results, priority) {
     results = app.prepareResults(results, priority);
-
+    
     for(res of results) {
         app.parent.append(res);
     }
+
+    const resultItems = app.parent.children();
+    resultItems.sort((a, b) => $(b).data('priority') - $(a).data('priority'));
+    resultItems.detach().appendTo(app.parent);
+
+    if(resultItems.length > 0) {
+        app.toggle(true);
+    } else {
+        app.toggle(false);
+    }
 };
 
-app.search = function(query) {
-    SearchService.execute(query, function(response, error) {
+app.showError = function(res) {
+	return $("<li/>", {
+        text: res, 
+        class: "error",
+        "data-type": "error"
+    }).data("item", res);
+};
+
+app.handleSearchHook = function(query) {
+    SearchHook.executeTagged(query, (err, response) => {
         if((app.input.val().trim().length == 0 && query.trim().length != 0 ) || query.indexOf($.trim(app.input.val())) == -1) return;
 
-        if(response == null) {
-            app.parent.prepend(error);
+        if(err) {
+            app.prioritize([err], Configurations.priority.high);
+            return;
+        }
+
+        if(response.response.length > 0) {
+            app.parent.html("");
+            app.prioritize(response.response, response.priority);
+            app.toggle(true);
+        } else {
+            SearchHook.execute(query, (err, response) => {
+                if((app.input.val().trim().length == 0 && query.trim().length != 0 ) || query.indexOf($.trim(app.input.val())) == -1) return;
+        
+                if(err) {
+                    app.prioritize([err], Configurations.priority.high);
+                    return;
+                }
+                
+                app.prioritize(response.response, response.priority);
+                app.toggle(true);
+            });
+        }
+    });
+};
+
+app.handleKeyDownHook = (query) => {
+    app.parent.html("");
+    KeyDownHook.execute(query, (err, res) => {
+        if((app.input.val().trim().length == 0 && query.trim().length != 0 ) || query.indexOf($.trim(app.input.val())) == -1) return;
+
+        if(err) {
+            app.prioritize([err], Configurations.priority.high);
             return;
         }
         
-        app.prioritize(response.response, response.priority);
+        app.prioritize(res.response, res.priority);
+        app.toggle(true);
+    });
+};
 
+app.handleEnterPress = (query) => {
+    app.parent.html("");
+    SettingService.selectedService.execute(query, (err, res) => {
+        if((app.input.val().trim().length == 0 && query.trim().length != 0 ) || query.indexOf($.trim(app.input.val())) == -1) return;
+
+        console.log("enter press", err, res);
+
+        if(err) {
+            app.prioritize([app.showError(err)], Configurations.priority.high);
+            return;
+        }
+        
+        app.prioritize(res.response, res.priority);
         app.toggle(true);
     });
 };
 
 app.clear = function() {
     app.input.val("");
-    app.toggle(false);
-    HistoryService.updated = true;
+    app.updated();
 };
 
 app.initilizeInputArea = function() {
@@ -216,21 +290,26 @@ app.initilizeInputArea = function() {
                             // if textarea is focused and no result is selected
                             HistoryService.push(app.input.val());
                             app.updated();
-                            app.search("cmd:" + app.input.val());                            
+                            //app.search("cmd:" + app.input.val());
+                            app.handleEnterPress(app.input.val());                            
                         } else {
                             app.onResultClick();
                         }
                         break;
 
             default:    // make search with default search engine
-                        app.toggle(false);
-                        HistoryService.updated = true;
+                        //app.toggle(false);
+                        //HistoryService.updated = true;
+                        
+
+                        /** trigger keydownhook */
+                        app.handleKeyDownHook($.trim(app.input.val()));
                         
                         if(timeoutHandler) {
                             window.clearTimeout(timeoutHandler);
                         }
                         timeoutHandler = setTimeout(function() {
-                            app.search($.trim(app.input.val()));
+                            app.handleSearchHook($.trim(app.input.val()));
                         }, debounceTime);
         }
     });
@@ -238,6 +317,7 @@ app.initilizeInputArea = function() {
 
 app.updated = function() {
     app.toggle(false);
+    HistoryService.updated = true;
 };
 
 /** 

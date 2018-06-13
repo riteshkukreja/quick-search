@@ -11,8 +11,7 @@ app.match = function(_cmd) {
 };
 
 app.execute = function(_cmd, callback) {
-    WindowsAppFinder.run(_cmd, callback);
-    //NotificationService.notify("App Service", "Your application has been started " + _cmd._name);
+    Configurations.os.run(_cmd, callback);
 };
 
 module.exports = app;

@@ -24,10 +24,22 @@ input#search {
     color: #2c3e50;
     font-weight: bolder;
     border: 0;
+    position: absolute;
+    top: 0%;
+    left: 0%;
 }
 
-input#search.results {
-    border-radius: 10px 10px 0px 0px;
+div.searchbar {
+    height: 60px;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    background: white;
+    border-radius: 10px;
+    position: relative;
+}
+
+div.searchbar.results {
+    /* border-radius: 10px 10px 0px 0px; */
     border-bottom: 0;
 }
 
@@ -41,6 +53,8 @@ ul#results {
     border-radius: 0px 0px 10px 10px;
     padding: 0px;
     margin: 0px;
+    margin-top: -10px;
+    padding-top: 10px;
     text-align: center;
     max-height: 400px;
     overflow-y: auto;
@@ -143,6 +157,16 @@ ul li.quora::after {
 ul li.app::after {
     content: "App";
     background: #2ecc71;
+}
+
+ul li.setting::after {
+    content: "Setting";
+    background: #8e44ad;
+}
+
+ul li.config::after {
+    content: "Configuration";
+    background: #1abc9c;
 }
 
 ul li.text::after, ul li.error::after {

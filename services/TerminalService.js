@@ -4,7 +4,7 @@ const pathModule = require("path");
 
 var app = {};
 app.regex = /cmd:/;
-app.priority = 10;
+app.priority = 8;
 
 const path = require('os').homedir();
 const cmd_pwd = "pwd";
@@ -57,12 +57,12 @@ app.execute = function(_cmd, callback, num) {
 
     const p = exec(_cmd, { timeout: 1000, cwd: path }, (e, stdout, stderr) => {
         if(e) {
-            callback(null, stderr);
+            callback(stderr, null);
         } else if(stdout) {
             stdout = $.trim(stdout).split("\n");
-            callback(processResults(stdout, _cmd));
+            callback(null, { response: processResults(stdout, _cmd), priority: app.priority });
         } else {
-            callback(null, "Something went wrong!");
+            callback("Something went wrong!", null);
         }
     })
 };

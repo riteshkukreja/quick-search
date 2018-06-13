@@ -29,14 +29,16 @@ class WindowsAppFinder {
         this._EXPLORER = "explorer.exe";
         this._FETCH_APP_CMD = "Get-StartApps";
         this._RUN_APP = "shell:\"appsFolder\\";
-        this._REGEX = "apps:";
+        this.regex = /apps:/;
 
         this._appList = this._fetchInstalledApps();
-        this.priority = 10;
+        this.priority = 8;
+
+        console.log("[WINDOWS_APP_FINDER]", "found installed apps: ", this._appList);
     }
 
     _fetchInstalledApps() {
-        const p = spawn(this._POWERSHELL, [this._FETCH_APP_CMD], {timeout: 1000});
+        const p = spawn(this._POWERSHELL, [this._FETCH_APP_CMD], {timeout: 5000});
         const out = p.stdout.toString().trim().split('\n')
             .map(item => item.trim())
             .slice(2)
@@ -54,7 +56,7 @@ class WindowsAppFinder {
     }
 
     match(_cmd) {
-        return _cmd.match(this._REGEX);;
+        return _cmd.match(this.regex);;
     }
 
     draw(app) {
@@ -66,16 +68,18 @@ class WindowsAppFinder {
     }
 
     execute(_cmd, callback, num) {
-        if(_cmd.match(this._REGEX))
+        if(_cmd.match(this.regex))
             num = undefined;
             
-        _cmd = _cmd.replace(this._REGEX, "");
+        _cmd = _cmd.replace(this.regex, "");
+        console.log("[WINDOWS_APP_FINDER]", _cmd);
         
         this.getResults(_cmd, num)
             .then(apps => {
+                console.log("[WINDOWS_APP_FINDER]", "found apps: ", apps);
                 const appsDom = apps.map(app => this.draw(app));
                 callback(appsDom);
-            }).catch(err =>callback(null, err));
+            }).catch(err => callback(null, err));
     }
 
     run(app, callback) {

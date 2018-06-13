@@ -3,7 +3,7 @@ var Configurations = require("./Configurations");
 var app = {};
 
 app.regex = /config:/;
-app.priority = 10;
+app.priority = 8;
 
 app.match = function(_cmd) {
     console.log("[CONFIG]", _cmd);
@@ -22,7 +22,7 @@ app.draw = function(_result) {
         );
 };
 
-app.getResults = function() {
+app.getResults = function(query) {
 	const configs = [
         { title: 'Search Engine', val: Configurations['searchEngine'].name },
         { title: 'Number of results per page', val: Configurations['resultsCount'] },
@@ -31,13 +31,16 @@ app.getResults = function() {
     ];
 
     return configs.slice()
+        .filter(a => query.trim().length > 0 && JSON.stringify(a).toLowerCase().includes(query.trim().toLowerCase()))
         .map(item => app.draw(item));
 };
 
 app.execute = function(_cmd, callback, num) {
     console.log("[CONFIG]", _cmd);
 
-    const configs = app.getResults();
+    _cmd = _cmd.replace(app.regex, "");
+
+    const configs = app.getResults(_cmd);
     callback(configs);
 };
 

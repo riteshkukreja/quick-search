@@ -3,10 +3,10 @@ var history = [];
 var curr = 0;
 app.regex = /history:/;
 app.updated = false;
-app.priority = 5;
+app.priority = 3;
 
 app.match = function(_cmd) {
-    return _cmd.replace(/\s+/, "").length == 0 || _cmd.match(app.regex);
+    return _cmd.match(app.regex);
 };
 
 app.push = function(instruction) {
@@ -26,14 +26,15 @@ app.push = function(instruction) {
 	curr++;
 }
 
-app.getLast = function(num) {
+app.getLast = function(query, num=5) {
 	if(curr > num)
-		return history.slice(curr - num).reverse();
-	return history.slice().reverse();
+		return history.filter(a => a.trim().toLowerCase().includes(query.trim().toLowerCase())).slice(curr - num).reverse();
+	return app.getAll();
 }
 
-app.getAll = function() {
-	return history.slice().reverse();
+app.getAll = function(query) {
+	query = query || "";
+	return history.filter(a => a.trim().toLowerCase().includes(query.trim().toLowerCase())).reverse();
 }
 
 app.next = function() {
@@ -80,8 +81,14 @@ app.draw = function(item) {
     }).data("item", item);
 }
 
+app.clear = function() {
+	history = [];
+	curr = 0;
+};
+
 var processResults = function(response) {
-    var ret = [];
+	var ret = [];
+	console.log("[HISTORY]",response);
     for(res of response)
         ret.push(app.draw(res));
     return ret;
@@ -91,14 +98,10 @@ app.execute = function(_cmd, callback, num) {
 	if(_cmd.replace(/\s+/, "").length > 0) {
 		_cmd = _cmd.replace(app.regex, "");
 
-		if(_cmd.match(/clear/)) {
-			history = [];
-			curr = 0;
-			callback(processResults(["History has been cleared"]));
-		} else
-			callback(processResults(app.getAll()));
+		const items = processResults(app.getAll(_cmd));
+		callback(items, null);
 	} else {
-		callback(processResults(app.getLast(num)));
+		callback(processResults(app.getLast(_cmd, num)));
 	}
 }
 
