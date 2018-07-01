@@ -30,6 +30,10 @@ var app = function(url, regex, name, drawCallback, executeCallback, limit, prior
     }
 
     this.getResults = function(query, num, callback) {
+        if(query.trim().length == 0) {
+            return;
+        }
+            
         if(CacheService.has(regex + query)) {
             var cachedResponse = CacheService.get(regex + query);
             if(cachedResponse.limit >= num) {

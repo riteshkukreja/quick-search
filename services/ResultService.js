@@ -324,26 +324,32 @@ app.updated = function() {
     @TODO
     -   Moves eratically on selecting results on mouse key up and down
 **/
+let lastScrollEventHandler = null;
 app.handleScroll = function(top) {
-    if(selectedResult == null) {
-        app.parent.animate({
-            scrollTop: 0
-        }, 200);
-        return;
-    };
+    if(lastScrollEventHandler)
+        clearTimeout(lastScrollEventHandler);
 
-    var selected_top = selectedResult.offset().top - $( document ).scrollTop();
-    var selected_bottom = selected_top + selectedResult.height() + 20;
-    var ul_height = app.parent.height();
-    var ul_scrollTop = app.parent.scrollTop();
-
-    console.log(selected_top, selected_bottom, ul_height, ul_scrollTop, selected_bottom - ul_height);
-
-    if(selected_bottom > ul_height || selected_top < ul_scrollTop ) {
-        app.parent.animate({
-            scrollTop: parseInt(selected_bottom)
-        }, 200);
-    }
+    lastScrollEventHandler = setTimeout(function() {
+        if(selectedResult == null) {
+            app.parent.animate({
+                scrollTop: 0
+            }, 1000);
+            return;
+        };
+    
+        var selected_top = selectedResult.offset().top - $( document ).scrollTop();
+        var selected_bottom = selected_top + selectedResult.height() + 20;
+        var ul_height = app.parent.height();
+        var ul_scrollTop = app.parent.scrollTop();
+    
+        console.log(selected_top, selected_bottom, ul_height, ul_scrollTop, selected_bottom - ul_height);
+    
+        if(selected_bottom > ul_height || selected_top < ul_scrollTop ) {
+            app.parent.animate({
+                scrollTop: parseInt(selected_bottom)
+            }, 200);
+        }
+    }, 500);
 };
 
 module.exports = app;

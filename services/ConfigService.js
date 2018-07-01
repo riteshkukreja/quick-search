@@ -30,6 +30,10 @@ app.getResults = function(query) {
         { title: 'Connected to internet', val: Configurations['isInternetConnected'] }
     ];
 
+    if(query.trim().length == 0)
+        return configs.slice()
+                .map(item => app.draw(item));
+
     return configs.slice()
         .filter(a => query.trim().length > 0 && JSON.stringify(a).toLowerCase().includes(query.trim().toLowerCase()))
         .map(item => app.draw(item));
