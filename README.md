@@ -46,6 +46,9 @@ npm run package
 ### Configurations
 ![Terminal Command](https://raw.githubusercontent.com/riteshkukreja/quick-search/master/screenshots/config.png)
 
+### Architecture of application
+![Architecture](https://raw.githubusercontent.com/riteshkukreja/quick-search/dev/screenshots/architecture.png)
+
 ## TODOs
 -   [x] Remove automatic execution of terminal command with `cmd:` flag.
 -   [x] Remove execution of terminal commmand on enter-press.

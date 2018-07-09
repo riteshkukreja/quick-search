@@ -39,15 +39,21 @@ class WindowsAppFinder {
 
     _fetchInstalledApps() {
         const p = spawn(this._POWERSHELL, [this._FETCH_APP_CMD], {timeout: 5000});
-        const out = p.stdout.toString().trim().split('\n')
-            .map(item => item.trim())
-            .slice(2)
-            .map(item => item.replace(/\s{2,}/gi, ':'))
-            .map(item => item.split(':'))
-            .filter(item => item.length > 1)
-            .map(item => {return { '_name': item[0], '_id': item[1] }});
 
-        return out;
+        if(p.stdout) {
+            const out = p.stdout.toString().trim().split('\n')
+                .map(item => item.trim())
+                .slice(2)
+                .map(item => item.replace(/\s{2,}/gi, ':'))
+                .map(item => item.split(':'))
+                .filter(item => item.length > 1)
+                .map(item => {return { '_name': item[0], '_id': item[1] }});
+
+            return out;
+        } else {
+            console.error("[WINDOWS_APP_FINDER]", "Something went wrong while retrieving apps for Windows");
+            return [];
+        }
     }
 
     async _executeApp(appId) {
