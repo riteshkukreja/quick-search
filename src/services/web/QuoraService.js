@@ -8,12 +8,12 @@ var QuoraService = new SearchConstructor(
         return $("<li/>", { 
             class: "result quora", 
             "data-type": "web" 
-        }).data("item", _result)
-            .append(
-                $("<h4/>", { text: _result.title })
-            ).append(
-                $("<p/>", { text: _result.description })
-            );
+        })
+        .append(
+            $("<h4/>", { text: _result.title })
+        ).append(
+            $("<p/>", { text: _result.description })
+        );
     }
 );
 

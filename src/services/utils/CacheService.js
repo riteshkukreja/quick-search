@@ -64,4 +64,6 @@ app.load = function(callback) {
 	}
 };
 
+// app.load();
+
 module.exports = app;

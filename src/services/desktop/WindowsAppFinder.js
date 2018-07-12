@@ -62,7 +62,7 @@ class WindowsAppFinder {
     }
 
     match(_cmd) {
-        return _cmd.match(this.regex);;
+        return _cmd.match(this.regex);
     }
 
     draw(app) {
@@ -70,7 +70,9 @@ class WindowsAppFinder {
             text: app._name, 
             class: "app",
             "data-type": "app"
-        }).data("item", app);
+        })
+        .data("item", app)
+        .data("handler", async (e) => await this.run(app));
     }
 
     execute(_cmd, callback, num) {
@@ -88,10 +90,8 @@ class WindowsAppFinder {
             }).catch(err => callback(null, err));
     }
 
-    run(app, callback) {
-        this._executeApp(app._id)
-            .then(res => callback(null, res))
-            .catch(err => callback(err, null));
+    async run(app) {
+        return this._executeApp(app._id);
     }
 
     getResultFitness(query, app) {

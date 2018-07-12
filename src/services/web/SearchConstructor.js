@@ -1,4 +1,5 @@
-var CacheService    = require("./CacheService");
+const BrowserService = require("./BrowserService");
+const CacheService   = require("../utils/CacheService");
 
 var app = function(url, regex, name, drawCallback, executeCallback, limit, priority, timeout) {
     this.URL = url;
@@ -7,6 +8,7 @@ var app = function(url, regex, name, drawCallback, executeCallback, limit, prior
     this.name = name;
     this.priority = priority || 5;
     this.timeout = timeout || 4 * 60 * 60 * 1000; // 4 hours
+    var lastRequest = null;
 
     var self = this;
 
@@ -14,12 +16,19 @@ var app = function(url, regex, name, drawCallback, executeCallback, limit, prior
         return _cmd.match(this.regex);
     };
 
-    this.draw = drawCallback || function(_result) {
+    this.draw = function(_result) {
+        if(drawCallback)
+            return drawCallback(_result)
+                .data("item", _result)
+                .data("handler", async (e) => await BrowserService.execute(_result.url));
+
         return $("<li/>", { 
             class: "result sample",
             "data-type": "web" ,
             text: JSON.stringify(_result)
-        }).data("item", _result);
+        })
+            .data("item", _result)
+            .data("handler", async (e) => await BrowserService.execute(_result.url));
     };
 
     var processResults = function(response) {
@@ -30,33 +39,38 @@ var app = function(url, regex, name, drawCallback, executeCallback, limit, prior
     }
 
     this.getResults = function(query, num, callback) {
-        if(query.trim().length == 0) {
+        query = query.trim();
+        if(query.length == 0) {
             return;
         }
-            
-        if(CacheService.has(regex + query)) {
-            var cachedResponse = CacheService.get(regex + query);
+
+        /** Check cache */
+		if(CacheService.has(this.name + ":" + query)) {
+            var cachedResponse = CacheService.get(this.name + ":" + query);
             if(cachedResponse.limit >= num) {
                 var sets = cachedResponse.payload.slice(0, num);
-                callback(processResults(sets));
+				callback(sets, null);
+				
                 return;
             }
         }
 
-        $.ajax({
+        lastRequest = $.ajax({
             url: this.URL + query + "&limit=" + num,
             method: 'get',
             dataType: 'json',
+            beforeSend : function()    {           
+                if(lastRequest != null) {
+                    lastRequest.abort();
+                }
+            },
             success: function(response) {
                 if(typeof response.success != "undefined" || response == null || response.length == 0) {
                     // failed
                     callback(null, "You are not connected to internet");
                 } else {
                     // success 
-                    // update cache
-                    CacheService.save(regex + query, {payload: response, limit: num}, self.timeout);
-
-                    // callback
+                    CacheService.save(this.name + ":" + query, {payload: response, limit: num}, self.timeout);
                     callback(processResults(response));
                 }
             },
@@ -69,7 +83,6 @@ var app = function(url, regex, name, drawCallback, executeCallback, limit, prior
     this.execute = executeCallback || function(_cmd, callback, num) {
         // remove handle if present
         _cmd = _cmd.replace(this.regex, "");
-        
         this.getResults(_cmd, num ? num: this.limit, callback);
     };
 };

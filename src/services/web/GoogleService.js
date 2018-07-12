@@ -9,7 +9,6 @@ var GoogleService = new SearchConstructor(
             class: "result google",
             "data-type": "web"  
         })
-        .data("item", _result)
         .append(
             $("<h4/>", { text: _result.title })
         ).append(

@@ -10,7 +10,7 @@ app.match = function(_cmd) {
 };
 
 app.push = function(instruction) {
-	if(instruction.trim().length == 0) return;
+	if(!instruction || instruction.trim().length == 0) return;
 
 	instruction = instruction.trim();
 
@@ -26,13 +26,13 @@ app.push = function(instruction) {
 	curr++;
 }
 
-app.getLast = function(query, num=5) {
+const getLast = function(query, num=5) {
 	if(curr > num)
 		return history.filter(a => a.trim().toLowerCase().includes(query.trim().toLowerCase())).slice(curr - num).reverse();
 	return app.getAll();
 }
 
-app.getAll = function(query) {
+const getAll = function(query) {
 	query = query || "";
 	return history.filter(a => a.trim().toLowerCase().includes(query.trim().toLowerCase())).reverse();
 }
@@ -73,7 +73,7 @@ app.prev = function() {
 	return null;
 }
 
-app.draw = function(item) {
+const draw = function(item) {
 	return $("<li/>", {
         text: item, 
         class: "history",
@@ -81,27 +81,54 @@ app.draw = function(item) {
     }).data("item", item);
 }
 
-app.clear = function() {
+const drawSettings = function(item, handler) {
+	return $("<li/>", {
+        text: item, 
+        class: "result setting",
+        "data-type": "setting"
+	})
+	.data("item", item)
+	.data('handler', handler);
+}
+
+const clear = function() {
 	history = [];
 	curr = 0;
 };
 
-var processResults = function(response) {
+const clearHistoryButton = (e) => {
+    console.log("clearing history");
+	clear();
+};
+
+const processResults = function(response) {
 	var ret = [];
 	console.log("[HISTORY]",response);
     for(res of response)
-        ret.push(app.draw(res));
+        ret.push(draw(res));
     return ret;
 };
 
+const checkIfToShowClearButton = (_cmd, callback) => {
+	const command = "Clear History";
+
+	if(command.toLowerCase().includes(_cmd.toLowerCase())) {
+		callback(drawSettings(command, clearHistoryButton));
+	}
+};
+
 app.execute = function(_cmd, callback, num) {
+	_cmd = _cmd.trim();
+
 	if(_cmd.replace(/\s+/, "").length > 0) {
 		_cmd = _cmd.replace(app.regex, "");
 
-		const items = processResults(app.getAll(_cmd));
+		const items = processResults(getAll(_cmd));
 		callback(items, null);
 	} else {
-		callback(processResults(app.getLast(_cmd, num)));
+		callback(processResults(getLast(_cmd, num)));
+
+		checkIfToShowClearButton(_cmd, callback);
 	}
 }
 

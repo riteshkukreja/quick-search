@@ -1,7 +1,4 @@
-const Configurations = require("./Configurations");
-
-const HistoryService = require("./HistoryService");
-const TerminalService = require("./TerminalService");
+const TerminalService = require("./terminal/TerminalService");
 
 const mockedService = {
     execute: (_cmd, callback) => callback("Mocked Service executed", null)
@@ -12,7 +9,7 @@ var app = {};
 app.regex = /settings:/;
 app.priority = 10;
 
-app.selectedService = mockedService;
+app.selectedService = null;//mockedService;
 
 app.match = function(_cmd) {
     return false;
@@ -30,16 +27,8 @@ app.draw = function(_result) {
     .data('handler', _result.handler);
 };
 
-app.clearHistoryButton = (e) => {
-    console.log("clearing history");
-    console.log(HistoryService.getAll());
-    HistoryService.clear();
-};
-
 app.getResults = function(query) {
-	const configs = [
-        { title: 'Clear History', handler: app.clearHistoryButton }
-    ];
+	const configs = [];
 
     if(app.selectedService == TerminalService) {
         configs.push(

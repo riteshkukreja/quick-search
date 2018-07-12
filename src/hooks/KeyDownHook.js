@@ -1,16 +1,19 @@
-const Configuration         = require('../services/Configurations');
+const Configuration         = require('../services/configurations/Configurations');
 
-const HistoryService 		= require("../services/HistoryService");
-const ConfigService		    = require("../services/ConfigService");
-const SettingService	    = require("../services/SettingService");
+const HistoryService 		= require("../services/history/HistoryService");
+const ConfigService		    = require("../services/configurations/ConfigService");
+const SettingService	    = require("../services/apps/SettingService");
+const AppService            = require("../services/desktop/AppService");
+const SearchService		    = require("../services/web/SearchService");
 
 class KeyDownHook {
     constructor() {
         this.services = [
-            Configuration.os,
+            AppService,
             HistoryService,
             ConfigService,
-            SettingService
+            SettingService,
+            SearchService
         ];
     }
 

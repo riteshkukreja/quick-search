@@ -1,5 +1,5 @@
 const ResultService   = require("../services/ResultService");
-const NotificationService   = require("../services/NotificationService");
+// const NotificationService   = require("../services/NotificationService");
 
 var textarea = $("#search");
 var resultArea = $("#results");

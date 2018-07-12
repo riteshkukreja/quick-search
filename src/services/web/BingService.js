@@ -8,14 +8,14 @@ var BingService = new SearchConstructor(
         return $("<li/>", { 
             class: "result bing",
             "data-type": "web" 
-        }).data("item", _result)
-            .append(
-                $("<h4/>", { text: _result.title })
-            ).append(
-                $("<span/>", { text: _result.url })
-            ).append(
-                $("<p/>", { text: _result.description })
-            );
+        })
+        .append(
+            $("<h4/>", { text: _result.title })
+        ).append(
+            $("<span/>", { text: _result.url })
+        ).append(
+            $("<p/>", { text: _result.description })
+        );
     }
 );
 
