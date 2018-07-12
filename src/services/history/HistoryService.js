@@ -29,7 +29,7 @@ app.push = function(instruction) {
 const getLast = function(query, num=5) {
 	if(curr > num)
 		return history.filter(a => a.trim().toLowerCase().includes(query.trim().toLowerCase())).slice(curr - num).reverse();
-	return app.getAll();
+	return getAll();
 }
 
 const getAll = function(query) {
@@ -113,7 +113,7 @@ const checkIfToShowClearButton = (_cmd, callback) => {
 	const command = "Clear History";
 
 	if(command.toLowerCase().includes(_cmd.toLowerCase())) {
-		callback(drawSettings(command, clearHistoryButton));
+		callback([drawSettings(command, clearHistoryButton)]);
 	}
 };
 
