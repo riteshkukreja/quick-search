@@ -41,13 +41,18 @@ class WindowsAppFinder {
         const p = spawn(this._POWERSHELL, [this._FETCH_APP_CMD], {timeout: 5000});
 
         if(p.stdout) {
+            /** last word in each line is the ID we want, the rest is the name */
             const out = p.stdout.toString().trim().split('\n')
                 .map(item => item.trim())
                 .slice(2)
-                .map(item => item.replace(/\s{2,}/gi, ':'))
-                .map(item => item.split(':'))
+                .map(item => item.split(" "))
                 .filter(item => item.length > 1)
-                .map(item => {return { '_name': item[0], '_id': item[1] }});
+                .map(arr => {
+                    const _id = arr.pop();
+                    const _name = arr.join(" ");
+
+                    return { _name, _id };
+                });
 
             return out;
         } else {
@@ -57,7 +62,7 @@ class WindowsAppFinder {
     }
 
     async _executeApp(appId) {
-        const p = spawn(this._POWERSHELL, [this._EXPLORER, this._RUN_APP + appId + "\""], {timeout: 1000});
+        const p = spawn(this._POWERSHELL, [this._EXPLORER, this._RUN_APP + appId + "\""], {timeout: 10000});
         return p;
     }
 
